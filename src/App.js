@@ -11,36 +11,51 @@ function App() {
   const [error, setError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [currentTime, setCurrentTime] = useState(moment().format("hh:mm A"));
+
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(moment().format("hh:mm A"));
     }, 4000);
     return () => clearInterval(timer);
-  });
-  const fetchWeatherData = async (city) => {
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_API_KEY}`
-      );
-      console.log("response", response);
-      if (response.status === 404) {
+  }, []);
+
+const fetchWeatherData = async (city) => {
+  try {
+    const response = await fetch(
+      `${process.env.REACT_APP_API_URL}/weather?q=${city}&appid=${process.env.REACT_APP_API_KEY}`
+    );
+
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
         const errorData = await response.json();
         setErrorMessage(errorData.message);
-        setError(true);
-        setWeatherData(null);
+      } else {
+        setErrorMessage("Unexpected error occurred");
       }
-      const responseData = await response.json();
-      console.log("responseData", responseData);
-      setWeatherData(responseData);
-    } catch (error) {
-      console.log(error);
+      setError(true);
+      return;
     }
-  };
+
+    const data = await response.json(); // ✅ Safe now
+    setWeatherData(data);
+    setError(false);
+
+  } catch (error) {
+    console.error("Fetch error:", error);
+    setErrorMessage("Network error or server is down.");
+    setError(true);
+  }
+};
+
 
   const handleSubmit = () => {
+    if (!city.trim()) return;
     fetchWeatherData(city);
     setOpen(true);
   };
+
   const handleClear = () => {
     setOpen(false);
     setCity("");
@@ -48,11 +63,17 @@ function App() {
     setErrorMessage("");
     setWeatherData(null);
   };
-  console.log("weatherDta", weatherData);
-  console.log("errorMessage", errorMessage);
+
+  const kelvinToCelsius = (kelvin) => {
+    return (kelvin - 273.15).toFixed(2);
+  };
+
   return (
     <div className="App">
-      <Card className="card" style={{ backgroundImage: `url(${skyImage})` }}>
+      <Card
+        className="card"
+        style={{ backgroundImage: `url(${skyImage})` }}
+      >
         <div className="cardHeader">
           <p className="title">Weather Forecast</p>
         </div>
@@ -66,6 +87,12 @@ function App() {
               InputLabelProps={{ style: { color: "white" } }}
               InputProps={{ style: { color: "white" } }}
               onChange={(e) => setCity(e.target.value)}
+              onKeyDown={(e)=>{
+                if(e.key === "Enter"){
+                  handleSubmit()
+                }
+              }
+            }
             />
             <div style={{ marginTop: "10px" }}>
               <Button variant="contained" onClick={handleSubmit}>
@@ -83,36 +110,43 @@ function App() {
                 </Button>
               </div>
             )}
-            {weatherData && (
-              <div style={{ padding: "20px" }}>
-                <div className="container">
-                  <p className="label">City:{city}</p>
-                  <p className="label"> {currentTime}</p>
-                </div>
-                <div className="container">
-                  <p className="label">Day:{moment().format("dddd")}</p>
-                  <p className="temp" style={{ marginTop: "30px" }}>
-                    {moment().format("LL")}
-                  </p>
-                </div>
-                <div className="container">
-                  <p className="temp">Temparature:{weatherData.main.temp}</p>
-                  <p className="temp">Humidity:{weatherData.main.humidity}</p>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    alignItems: "flex-end",
-                    margin: "10px",
-                  }}
-                >
-                  <Button variant="outlined" onClick={handleClear}>
-                    Clear
-                  </Button>
-                </div>
-              </div>
-            )}
+        {weatherData?.main && (
+  <div className="weather-card">
+    <div className="weather-header">
+      <p className="weather-city">📍 {weatherData.name}</p>
+      <p className="weather-time">{currentTime}</p>
+    </div>
+
+    <div className="weather-meta">
+      <p className="weather-day">{moment().format("dddd")}</p>
+      <p className="weather-date">{moment().format("LL")}</p>
+    </div>
+
+    <div className="weather-info">
+  <img
+    src={`https://openweathermap.org/img/wn/${weatherData.weather[0].icon}@2x.png`}
+    alt="weather icon"
+    style={{ width: "60px", height: "60px", marginRight: "10px" }}
+  />
+  <div>
+    <p className="weather-temp">
+      🌡️ Temperature: {kelvinToCelsius(weatherData.main.temp)}°C
+    </p>
+    <p className="weather-humidity">
+      💧 Humidity: {weatherData.main.humidity}%
+    </p>
+  </div>
+</div>
+
+
+    <div className="weather-footer">
+      <Button variant="contained" onClick={handleClear}>
+        Clear
+      </Button>
+    </div>
+  </div>
+)}
+
           </div>
         )}
       </Card>

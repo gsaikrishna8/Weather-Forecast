@@ -1,38 +1,99 @@
+/* App container */
 .App {
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #000000; /* fallback background */
+  background-size: cover;
+  background-position: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Card with background image */
+.card {
+  position: relative;
+  background-size: cover;
+  background-position: center;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Card header */
+.cardHeader {
+  padding: 10px 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.title {
+  font-size: 24px;
+  color: #fff;
+  font-weight: bold;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Input form */
+.inputContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 20px;
+}
+
+/* Weather info section */
+.weather-card {
+  background: rgba(0, 0, 0, 0.5); /* dark overlay */
+  border-radius: 12px;
+  padding: 20px;
+  margin: 15px auto;
+  color: #fff;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* Weather details */
+.weather-header,
+.weather-meta,
+.weather-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+}
+
+.weather-info {
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  text-align: left;
+  gap: 10px;
 }
 
-.App-link {
-  color: #61dafb;
+.weather-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Weather text styles */
+.weather-city,
+.weather-time,
+.weather-day,
+.weather-date,
+.weather-temp,
+.weather-humidity,
+.temp {
+  font-size: 16px;
+  color: #ffffff;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Error message */
+.temp {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 15px 0;
 }
